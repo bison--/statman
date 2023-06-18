@@ -16,8 +16,10 @@ IF ERRORLEVEL 1 (
     pip install -r requirements.txt
 )
 
+echo Starting app...
 REM Start the app
 python app.py
 
+echo stopping app...
 REM Deactivate the virtual environment when the app stops
 call venv\Scripts\deactivate.bat
