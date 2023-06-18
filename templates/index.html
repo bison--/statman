@@ -30,6 +30,9 @@
         <canvas id="memoryChart"></canvas>
     </div>
     <div class="chart-container">
+        <canvas id="diskTimeChart"></canvas>
+    </div>
+    <div class="chart-container">
         <canvas id="diskChart"></canvas>
     </div>
     <div class="chart-container">
@@ -90,12 +93,46 @@
             }
         );
 
+        var diskTimeData = {
+        labels: [],
+        datasets: [
+                {
+                    label: 'Disk Read Times',
+                    borderColor: 'rgb(75, 192, 192)',
+                    data: []
+                },
+                {
+                    label: 'Disk Write Times',
+                    borderColor: 'rgb(153, 102, 255)',
+                    data: []
+                }
+            ]
+        };
+        var diskTimeChart = new Chart(
+            document.getElementById('diskTimeChart'),
+            {
+                type: 'line',
+                data: diskTimeData,
+                options: {
+                    maintainAspectRatio: false,
+                }
+            }
+        );
+
+
         // Disk IO Chart
         var diskData = {
             labels: [],
             datasets: [
                 {
-                    label: 'Disk IO (bytes)',
+                    label: 'Disk IO read (bytes)',
+                    data: [],
+                    fill: false,
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.1
+                },
+                {
+                    label: 'Disk IO write (bytes)',
                     data: [],
                     fill: false,
                     borderColor: 'rgb(153, 102, 255)',
@@ -175,8 +212,14 @@
             memoryData.datasets[0].data.push(stats.memory);
             memoryChart.update();
 
+            diskTimeData.labels.push(now);
+            diskTimeData.datasets[0].data.push(stats.disk_io_read_times);  // disk read time
+            diskTimeData.datasets[1].data.push(stats.disk_io_write_times);  // disk write time
+            diskTimeChart.update();
+
             diskData.labels.push(now);
-            diskData.datasets[0].data.push(stats.disk_io);
+            diskData.datasets[0].data.push(stats.disk_io_read);
+            diskData.datasets[1].data.push(stats.disk_io_write);
             diskChart.update();
 
             if (stats.gpu_0) {
@@ -201,6 +244,11 @@
 
                 diskData.labels.shift();
                 diskData.datasets[0].data.shift();
+                diskData.datasets[1].data.shift();
+
+                diskTimeData.labels.shift();
+                diskTimeData.datasets[0].data.shift();  // disk read time
+                diskTimeData.datasets[1].data.shift();  // disk write time
 
                 gpu0MemoryData.labels.shift();
                 gpu0MemoryData.datasets[0].data.shift();

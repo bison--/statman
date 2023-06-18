@@ -9,6 +9,8 @@ It has no security what soever and is not meant to be used directly connected to
 
 ## setup / start
 
+Access: http://localhost:7001
+
 ### Windows
 
 ````bat

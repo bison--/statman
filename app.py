@@ -14,16 +14,38 @@ socketio = SocketIO(app, async_mode='eventlet')
 
 
 def background_thread():
+    last_disk_io_read = 0
+    last_disk_io_write = 0
+
+    last_disk_io_read_times = 0
+    last_disk_io_write_times = 0
+
     while True:
+        current_disk_io_read = psutil.disk_io_counters().read_bytes
+        current_disk_io_write = psutil.disk_io_counters().write_bytes
+
+        current_disk_io_read_times = psutil.disk_io_counters().read_time
+        current_disk_io_write_times = psutil.disk_io_counters().write_time
+
         stats = {
             "cpu": {
                 "total": psutil.cpu_percent(),
                 "per_cpu": psutil.cpu_percent(percpu=True)
             },
             "memory": psutil.virtual_memory().percent,
-            "disk_io": psutil.disk_io_counters().read_bytes + psutil.disk_io_counters().write_bytes,
+            "disk_io_read": current_disk_io_read - last_disk_io_read,
+            "disk_io_write": current_disk_io_write - last_disk_io_write,
+            "disk_io_read_times": current_disk_io_read_times - last_disk_io_read_times,
+            "disk_io_write_times": current_disk_io_write_times - last_disk_io_write_times,
         }
 
+        last_disk_io_read = current_disk_io_read
+        last_disk_io_write = current_disk_io_write
+
+        last_disk_io_read_times = current_disk_io_read_times
+        last_disk_io_write_times = current_disk_io_write_times
+
+        print(stats)
         GPUs = GPUtil.getGPUs()
         for i, gpu in enumerate(GPUs):
             stats[f"gpu_{i}"] = {
