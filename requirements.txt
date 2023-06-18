@@ -1,5 +1,11 @@
+# server
+
 flask
 flask_socketio
 eventlet
 psutil
 gputil
+
+# client
+requests
+matplotlib
