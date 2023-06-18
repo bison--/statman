@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, jsonify
 from flask_socketio import SocketIO
 import psutil
 import GPUtil
@@ -12,8 +12,11 @@ eventlet.monkey_patch()  # Required for WebSocket communication in eventlet.
 app = Flask(__name__, static_url_path='/assets', static_folder='assets')
 socketio = SocketIO(app, async_mode='eventlet')
 
+latest_stats = None  # Added: a global variable to hold the latest stats
 
 def background_thread():
+    global latest_stats  # Added: we'll update this global variable
+
     last_disk_io_read = 0
     last_disk_io_write = 0
 
@@ -53,14 +56,18 @@ def background_thread():
                 "load": gpu.load * 100,
             }
 
+        latest_stats = stats  # Added: store the latest stats
+
         socketio.emit('new_stats', stats, namespace='/data')
         time.sleep(conf.REFRESH_TIME)  # update every second
-
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
+@app.route('/data', methods=['GET'])  # Added: new HTTP endpoint
+def data():
+    return jsonify(latest_stats)  # Return the latest stats as JSON
 
 @socketio.on('connect', namespace='/data')
 def data_connect():
@@ -69,4 +76,5 @@ def data_connect():
 
 
 if __name__ == '__main__':
+    eventlet.spawn(background_thread)  # start the background thread when the server starts
     socketio.run(app, host=conf.HOST, port=conf.PORT)
