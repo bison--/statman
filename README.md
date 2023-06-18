@@ -2,14 +2,15 @@
 
 just a small throw away project to monitor my headless AI computer on my local network.
 
+Access: http://localhost:7001  
+API-Url: http://localhost:7001/data
+
 ## WARNING
 
 DO NOT use this outside of your LAN or in any other network you don't fully trust.  
 It has no security what soever and is not meant to be used directly connected to the Internet!
 
 ## setup / start
-
-Access: http://localhost:7001
 
 ### Windows
 

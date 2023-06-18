@@ -7,5 +7,6 @@ psutil
 gputil
 
 # client
-requests
-matplotlib
+#requests
+#matplotlib
+#dearpygui

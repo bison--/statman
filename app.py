@@ -14,6 +14,7 @@ socketio = SocketIO(app, async_mode='eventlet')
 
 latest_stats = None  # Added: a global variable to hold the latest stats
 
+
 def background_thread():
     global latest_stats  # Added: we'll update this global variable
 
@@ -61,13 +62,16 @@ def background_thread():
         socketio.emit('new_stats', stats, namespace='/data')
         time.sleep(conf.REFRESH_TIME)  # update every second
 
+
 @app.route('/')
 def index():
     return render_template('index.html')
 
+
 @app.route('/data', methods=['GET'])  # Added: new HTTP endpoint
 def data():
     return jsonify(latest_stats)  # Return the latest stats as JSON
+
 
 @socketio.on('connect', namespace='/data')
 def data_connect():
