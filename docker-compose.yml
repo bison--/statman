@@ -1,0 +1,13 @@
+# docker-compose.yml
+
+version: '3'
+
+services:
+  system-stats:
+    build: .
+    ports:
+      - 5000:5000
+    volumes:
+      - /:/host
+    network_mode: "host"
+    #privileged: true

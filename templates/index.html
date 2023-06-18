@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>System Stats</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            margin: 0;
+            background-color: #181818;
+            color: #fff;
+        }
+        .chart-container {
+            flex: 1;
+            min-height: 0;
+        }
+        canvas {
+            height: 100% !important;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="chart-container">
+        <canvas id="cpuChart"></canvas>
+    </div>
+    <div class="chart-container">
+        <canvas id="memoryChart"></canvas>
+    </div>
+    <div class="chart-container">
+        <canvas id="diskChart"></canvas>
+    </div>
+    <div class="chart-container">
+        <canvas id="gpu0MemoryChart"></canvas>
+    </div>
+    <div class="chart-container">
+        <canvas id="gpu0LoadChart"></canvas>
+    </div>
+    <!-- Repeat for more GPUs -->
+
+    <script>
+        var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + '/test');
+        // CPU Chart
+        var cpuData = {
+            labels: [],
+            datasets: [
+                {
+                    label: 'CPU Usage (%)',
+                    data: [],
+                    fill: false,
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.1
+                }
+            ]
+        };
+        var cpuChart = new Chart(
+            document.getElementById('cpuChart'),
+            {
+                type: 'line',
+                data: cpuData,
+                options: {
+                    maintainAspectRatio: false,
+                },
+            }
+        );
+
+        // Memory Chart
+        var memoryData = {
+            labels: [],
+            datasets: [
+                {
+                    label: 'Memory Usage (%)',
+                    data: [],
+                    fill: false,
+                    borderColor: 'rgb(255, 99, 132)',
+                    tension: 0.1
+                }
+            ]
+        };
+        var memoryChart = new Chart(
+            document.getElementById('memoryChart'),
+            {
+                type: 'line',
+                data: memoryData,
+                options: {
+                    maintainAspectRatio: false,
+                },
+            }
+        );
+
+        // Disk IO Chart
+        var diskData = {
+            labels: [],
+            datasets: [
+                {
+                    label: 'Disk IO (bytes)',
+                    data: [],
+                    fill: false,
+                    borderColor: 'rgb(153, 102, 255)',
+                    tension: 0.1
+                }
+            ]
+        };
+        var diskChart = new Chart(
+            document.getElementById('diskChart'),
+            {
+                type: 'line',
+                data: diskData,
+                options: {
+                    maintainAspectRatio: false,
+                },
+            }
+        );
+
+        // GPU Memory Chart
+        var gpu0MemoryData = {
+            labels: [],
+            datasets: [
+                {
+                    label: 'GPU 0 Memory Usage (%)',
+                    data: [],
+                    fill: false,
+                    borderColor: 'rgb(255, 159, 64)',
+                    tension: 0.1
+                }
+            ]
+        };
+        var gpu0MemoryChart = new Chart(
+            document.getElementById('gpu0MemoryChart'),
+            {
+                type: 'line',
+                data: gpu0MemoryData,
+                options: {
+                    maintainAspectRatio: false,
+                },
+            }
+        );
+
+        // GPU Load Chart
+        var gpu0LoadData = {
+            labels: [],
+            datasets: [
+                {
+                    label: 'GPU 0 Load (%)',
+                    data: [],
+                    fill: false,
+                    borderColor: 'rgb(255, 205, 86)',
+                    tension: 0.1
+                }
+            ]
+        };
+        var gpu0LoadChart = new Chart(
+            document.getElementById('gpu0LoadChart'),
+            {
+                type: 'line',
+                data: gpu0LoadData,
+                options: {
+                    maintainAspectRatio: false,
+                },
+            }
+        );
+
+        // More GPU charts...
+
+        socket.on('new_stats', function (stats) {
+            var now = new Date().toLocaleTimeString();  // current time
+
+            cpuData.labels.push(now);
+            cpuData.datasets[0].data.push(stats.cpu.total);
+            cpuChart.update();
+
+            memoryData.labels.push(now);
+            memoryData.datasets[0].data.push(stats.memory);
+            memoryChart.update();
+
+            diskData.labels.push(now);
+            diskData.datasets[0].data.push(stats.disk_io);
+            diskChart.update();
+
+            if (stats.gpu_0) {
+                gpu0MemoryData.labels.push(now);
+                gpu0MemoryData.datasets[0].data.push(stats.gpu_0.memory);
+                gpu0MemoryChart.update();
+
+                gpu0LoadData.labels.push(now);
+                gpu0LoadData.datasets[0].data.push(stats.gpu_0.load);
+                gpu0LoadChart.update();
+            }
+
+            // More GPU data...
+
+            // Remove old data (to prevent memory issues)
+            if (cpuData.labels.length > 60) {
+                cpuData.labels.shift();
+                cpuData.datasets[0].data.shift();
+
+                memoryData.labels.shift();
+                memoryData.datasets[0].data.shift();
+
+                diskData.labels.shift();
+                diskData.datasets[0].data.shift();
+
+                gpu0MemoryData.labels.shift();
+                gpu0MemoryData.datasets[0].data.shift();
+
+                gpu0LoadData.labels.shift();
+                gpu0LoadData.datasets[0].data.shift();
+
+                // More GPU shifts...
+            }
+        });
+    </script>
+</body>
+</html>
