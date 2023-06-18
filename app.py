@@ -5,6 +5,8 @@ import GPUtil
 import time
 import eventlet
 
+import conf_loader as conf
+
 eventlet.monkey_patch()  # Required for WebSocket communication in eventlet.
 
 app = Flask(__name__)
@@ -45,4 +47,4 @@ def test_connect():
 
 
 if __name__ == '__main__':
-    socketio.run(app, host='0.0.0.0', port=5000)
+    socketio.run(app, host='0.0.0.0', port=conf.PORT)
