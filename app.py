@@ -53,8 +53,8 @@ def background_thread():
                 "load": gpu.load * 100,
             }
 
-        socketio.emit('new_stats', stats, namespace='/test')
-        time.sleep(1)  # update every second
+        socketio.emit('new_stats', stats, namespace='/data')
+        time.sleep(conf.REFRESH_TIME)  # update every second
 
 
 @app.route('/')
@@ -62,11 +62,11 @@ def index():
     return render_template('index.html')
 
 
-@socketio.on('connect', namespace='/test')
-def test_connect():
+@socketio.on('connect', namespace='/data')
+def data_connect():
     print('Client connected')
     eventlet.spawn(background_thread)
 
 
 if __name__ == '__main__':
-    socketio.run(app, host='0.0.0.0', port=conf.PORT)
+    socketio.run(app, host=conf.HOST, port=conf.PORT)
