@@ -9,7 +9,7 @@ import conf_loader as conf
 
 eventlet.monkey_patch()  # Required for WebSocket communication in eventlet.
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='/assets', static_folder='assets')
 socketio = SocketIO(app, async_mode='eventlet')
 
 
