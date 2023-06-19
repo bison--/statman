@@ -39,8 +39,8 @@ def background_thread():
             "memory": psutil.virtual_memory().percent,
             "disk_io_read": current_disk_io_read - last_disk_io_read,
             "disk_io_write": current_disk_io_write - last_disk_io_write,
-            "disk_io_read_times": current_disk_io_read_times - last_disk_io_read_times,
-            "disk_io_write_times": current_disk_io_write_times - last_disk_io_write_times,
+            "disk_io_read_times": current_disk_io_read_times - last_disk_io_read_times if latest_stats else 0,
+            "disk_io_write_times": current_disk_io_write_times - last_disk_io_write_times if latest_stats else 0,
         }
 
         last_disk_io_read = current_disk_io_read
