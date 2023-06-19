@@ -34,9 +34,6 @@
         <canvas id="memoryChart"></canvas>
     </div>
     <div class="chart-container">
-        <canvas id="diskTimeChart"></canvas>
-    </div>
-    <div class="chart-container">
         <canvas id="diskChart"></canvas>
     </div>
     <div class="chart-container">
@@ -102,31 +99,6 @@
                 options: options_settings,
             }
         );
-
-        var diskTimeData = {
-        labels: [],
-        datasets: [
-                {
-                    label: 'Disk Read Times',
-                    borderColor: 'rgb(75, 192, 192)',
-                    data: []
-                },
-                {
-                    label: 'Disk Write Times',
-                    borderColor: 'rgb(153, 102, 255)',
-                    data: []
-                }
-            ]
-        };
-        var diskTimeChart = new Chart(
-            document.getElementById('diskTimeChart'),
-            {
-                type: 'line',
-                data: diskTimeData,
-                options: options_settings,
-            }
-        );
-
 
         // Disk IO Chart
         var diskData = {
@@ -213,11 +185,6 @@
             memoryData.labels.push(now);
             memoryData.datasets[0].data.push(stats.memory);
             memoryChart.update();
-
-            diskTimeData.labels.push(now);
-            diskTimeData.datasets[0].data.push(stats.disk_io_read_times);  // disk read time
-            diskTimeData.datasets[1].data.push(stats.disk_io_write_times);  // disk write time
-            diskTimeChart.update();
 
             diskData.labels.push(now);
             diskData.datasets[0].data.push(stats.disk_io_read);
